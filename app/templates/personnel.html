@@ -1,0 +1,458 @@
+{% extends "base.html" %}{% block title %}Personnel Directory · NS M&E{% endblock %}{% block body %}
+<section aria-labelledby="personnel-title">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title" id="personnel-title">Personnel Directory</h1>
+      <p class="mut" style="margin: 6px 0 0;">Search and view personnel within your assigned area.</p>
+    </div>
+  </div>
+
+  <div class="kpi-grid personnel-metrics" aria-label="Personnel summary">
+    <div class="kpi"><b>{{metrics.total}}</b><span class="label">Total personnel</span></div>
+    <div class="kpi"><b>{{metrics.active}}</b><span class="label">Active in service</span></div>
+    <div class="kpi"><b>{{metrics.completed}}</b><span class="label">Completed cycle</span></div>
+    <div class="kpi"><b>{{metrics.degree}}</b><span class="label">Degree</span></div>
+    <div class="kpi"><b>{{metrics.hnd}}</b><span class="label">HND</span></div>
+    <div class="kpi"><b>{{metrics.diploma}}</b><span class="label">Diploma</span></div>
+    <div class="kpi"><b>{{metrics.masters}}</b><span class="label">Masters</span></div>
+  </div>
+
+  <div class="card directory-card">
+    <div class="directory-toolbar">
+      <label class="directory-search">
+        <span>Search personnel</span>
+        <input id="personnel-search" type="search" placeholder="ID, name, institution, course or posting site" autocomplete="off" aria-label="Search by personnel ID, full name, institution, course, or posting site">
+      </label>
+      <span class="mut directory-search-hint">Results update as you type.</span>
+    </div>
+
+    <div class="directory-filters" aria-label="Filter personnel">
+      <label>Region
+        <select id="filter-region">
+          <option value="">All regions</option>
+          {% for row in regions %}<option value="{{row.region_name}}">{{row.region_name}}</option>{% endfor %}
+        </select>
+      </label>
+      <label>District
+        <select id="filter-district" disabled>
+          <option value="">All districts</option>
+        </select>
+      </label>
+      <label>User agency
+        <select id="filter-agency">
+          <option value="">All agencies</option>
+          {% for row in agencies %}<option value="{{row.agency_id}}">{{row.agency_name}}</option>{% endfor %}
+        </select>
+      </label>
+      <label>Qualification
+        <select id="filter-qualification">
+          <option value="">All qualifications</option>
+          <option>Degree</option><option>HND</option><option>Diploma</option><option>Masters</option>
+        </select>
+      </label>
+      <label>Gender
+        <select id="filter-gender">
+          <option value="">All genders</option>
+          <option>Male</option><option>Female</option>
+        </select>
+      </label>
+      <label>Service outcome / status
+        <select id="filter-status">
+          <option value="">All statuses</option>
+          <option value="ACTIVE">Active</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="DISCONTINUED">Discontinued</option>
+          <option value="ABSCONDED">Absconded</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="directory-result-bar">
+      <p id="directory-result-count" class="mut" role="status" aria-live="polite">Loading personnel…</p>
+      <p id="directory-error" class="err" role="alert" hidden></p>
+    </div>
+
+    <div class="scroll directory-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Personnel</th><th>Institution / Course</th><th>Qualification</th>
+            <th>Posting site</th><th>Gender</th><th>Service status</th><th>Profile</th>
+          </tr>
+        </thead>
+        <tbody id="personnel-rows"></tbody>
+      </table>
+      <div id="directory-empty" class="empty-state" hidden>No personnel match these search terms and filters.</div>
+    </div>
+
+    <div class="directory-pagination">
+      <button id="previous-page" type="button" class="sec" disabled>Previous</button>
+      <span id="directory-page-label" class="mut"></span>
+      <button id="next-page" type="button" disabled>Next</button>
+    </div>
+  </div>
+</section>
+
+<dialog id="personnel-profile" class="profile-drawer" aria-labelledby="profile-title">
+  <div class="profile-heading">
+    <div>
+      <p class="mut" style="margin: 0 0 4px;">Personnel profile</p>
+      <h2 id="profile-title">Loading profile…</h2>
+    </div>
+    <button id="profile-close" class="sec" type="button" aria-label="Close personnel profile">Close</button>
+  </div>
+  <div id="profile-error" class="err" role="alert" hidden></div>
+  <div id="profile-content"></div>
+</dialog>
+
+<style>
+.personnel-metrics { margin-bottom: 20px; }
+.directory-card { padding: 20px; }
+.directory-toolbar { display: flex; align-items: end; justify-content: space-between; gap: 14px; margin-bottom: 18px; }
+.directory-search { display: grid; gap: 7px; flex: 1; max-width: 640px; font-weight: 700; }
+.directory-search input { width: 100%; min-height: 46px; }
+.directory-search-hint { padding-bottom: 11px; font-size: .9rem; }
+.directory-filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); gap: 12px; padding: 16px; background: rgba(255,255,255,.025); border: 1px solid var(--line); border-radius: 12px; }
+.directory-filters label { display: grid; gap: 6px; color: #dfeeff; font-size: .85rem; font-weight: 700; }
+.directory-filters select { width: 100%; min-width: 0; }
+.directory-result-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 48px; }
+.directory-result-bar p { margin: 10px 0; }
+.directory-result-bar .err { padding: 7px 10px; margin: 4px 0; }
+.directory-table { min-height: 150px; }
+.directory-table td { min-width: 100px; }
+.directory-table td:first-child { min-width: 170px; }
+.directory-pagination { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: 16px; }
+.directory-pagination button { min-width: 104px; }
+.profile-drawer { margin: 0 0 0 auto; width: min(620px, 100vw); height: 100dvh; max-height: none; padding: 24px; border: 1px solid var(--line); border-right: 0; border-radius: 18px 0 0 18px; background: var(--card-strong); color: var(--ink); box-shadow: var(--shadow); overflow-y: auto; }
+.profile-drawer::backdrop { background: rgba(1, 9, 18, .72); backdrop-filter: blur(3px); }
+.profile-heading { position: sticky; top: -24px; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 14px; margin: -24px -24px 20px; padding: 20px 24px; background: var(--card-strong); border-bottom: 1px solid var(--line); }
+.profile-heading h2 { font-size: 1.25rem; }
+.profile-section { margin-bottom: 18px; padding: 16px; background: rgba(255,255,255,.025); border: 1px solid var(--line); border-radius: 12px; }
+.profile-section h3 { margin: 0 0 12px; font-size: 1rem; }
+.profile-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+.profile-field { min-width: 0; }
+.profile-field small { display: block; margin-bottom: 3px; color: var(--mut); }
+.profile-field strong { overflow-wrap: anywhere; }
+.profile-outcome { display: inline-flex; margin-top: 12px; }
+.profile-monthly { font-size: .9rem; }
+.profile-monthly th, .profile-monthly td { padding: 9px 7px; }
+@media (max-width: 600px) {
+  .directory-card { padding: 14px; }
+  .directory-toolbar { align-items: stretch; flex-direction: column; gap: 4px; }
+  .directory-search-hint { padding: 0; }
+  .directory-result-bar { align-items: flex-start; flex-direction: column; }
+  .profile-drawer { width: 100vw; padding: 18px; border-radius: 0; }
+  .profile-heading { top: -18px; margin: -18px -18px 16px; padding: 16px 18px; }
+  .profile-fields { grid-template-columns: 1fr; }
+}
+</style>
+
+<script>
+(() => {
+  const searchInput = document.getElementById("personnel-search");
+  const regionSelect = document.getElementById("filter-region");
+  const districtSelect = document.getElementById("filter-district");
+  const agencySelect = document.getElementById("filter-agency");
+  const qualificationSelect = document.getElementById("filter-qualification");
+  const genderSelect = document.getElementById("filter-gender");
+  const statusSelect = document.getElementById("filter-status");
+  const rowsElement = document.getElementById("personnel-rows");
+  const countElement = document.getElementById("directory-result-count");
+  const emptyElement = document.getElementById("directory-empty");
+  const errorElement = document.getElementById("directory-error");
+  const previousButton = document.getElementById("previous-page");
+  const nextButton = document.getElementById("next-page");
+  const pageLabel = document.getElementById("directory-page-label");
+  const profile = document.getElementById("personnel-profile");
+  const profileTitle = document.getElementById("profile-title");
+  const profileContent = document.getElementById("profile-content");
+  const profileError = document.getElementById("profile-error");
+  const limit = 50;
+  let offset = 0;
+  let searchTimer;
+  let requestNumber = 0;
+  const requestedAgency = new URLSearchParams(window.location.search).get("agency_id");
+  if (requestedAgency && Array.from(agencySelect.options).some((option) => option.value === requestedAgency)) {
+    agencySelect.value = requestedAgency;
+  }
+
+  const text = (value) => value === null || value === undefined || value === "" ? "—" : String(value);
+  const titleCase = (value) => value ? value.charAt(0) + value.slice(1).toLowerCase() : "";
+
+  function addCell(row, value, extraClass) {
+    const cell = document.createElement("td");
+    cell.textContent = text(value);
+    if (extraClass) cell.className = extraClass;
+    row.appendChild(cell);
+    return cell;
+  }
+
+  function statusBadge(value) {
+    const badge = document.createElement("span");
+    badge.className = "pill " + (value === "ACTIVE" || value === "COMPLETED" ? "APPROVED" : value === "DECEASED" ? "REJECTED" : "SUBMITTED");
+    badge.textContent = titleCase(value || "ACTIVE");
+    return badge;
+  }
+
+  function renderRows(data) {
+    rowsElement.replaceChildren();
+    data.rows.forEach((person) => {
+      const row = document.createElement("tr");
+      const identity = document.createElement("td");
+      const name = document.createElement("strong");
+      name.textContent = [person.surname, person.other_names].filter(Boolean).join(" ");
+      const id = document.createElement("div");
+      id.className = "mut";
+      id.textContent = person.personnel_id;
+      identity.append(name, id);
+      row.appendChild(identity);
+
+      const education = document.createElement("td");
+      education.textContent = text(person.institution_attended);
+      const course = document.createElement("div");
+      course.className = "mut";
+      course.textContent = text(person.course_of_study);
+      education.appendChild(course);
+      row.appendChild(education);
+
+      addCell(row, person.qualification);
+      const posting = document.createElement("td");
+      posting.textContent = text(person.agency_name);
+      const district = document.createElement("div");
+      district.className = "mut";
+      district.textContent = [person.district_name, person.region_name].filter(Boolean).join(", ");
+      posting.appendChild(district);
+      row.appendChild(posting);
+      addCell(row, person.gender);
+      const statusCell = document.createElement("td");
+      statusCell.appendChild(statusBadge(person.service_status));
+      row.appendChild(statusCell);
+      const actionCell = document.createElement("td");
+      const viewButton = document.createElement("button");
+      viewButton.type = "button";
+      viewButton.className = "sec";
+      viewButton.dataset.personnelId = person.personnel_id;
+      viewButton.textContent = "View";
+      viewButton.setAttribute("aria-label", "View profile for " + [person.surname, person.other_names].filter(Boolean).join(" "));
+      actionCell.appendChild(viewButton);
+      row.appendChild(actionCell);
+      rowsElement.appendChild(row);
+    });
+
+    const first = data.total ? data.offset + 1 : 0;
+    const last = Math.min(data.offset + data.rows.length, data.total);
+    countElement.textContent = `Showing ${first}–${last} of ${data.total} personnel`;
+    pageLabel.textContent = data.total ? `Page ${Math.floor(data.offset / limit) + 1} of ${Math.ceil(data.total / limit)}` : "";
+    previousButton.disabled = data.offset <= 0;
+    nextButton.disabled = data.offset + data.rows.length >= data.total;
+    emptyElement.hidden = data.rows.length > 0;
+  }
+
+  async function loadPersonnel() {
+    const currentRequest = ++requestNumber;
+    errorElement.hidden = true;
+    countElement.textContent = "Loading personnel…";
+    const query = new URLSearchParams({
+      q: searchInput.value.trim(),
+      region: regionSelect.value,
+      district_id: districtSelect.value,
+      agency_id: agencySelect.value,
+      qualification: qualificationSelect.value,
+      gender: genderSelect.value,
+      status: statusSelect.value,
+      offset: String(offset),
+      limit: String(limit)
+    });
+    try {
+      const response = await fetch(`/personnel/search?${query}`, { headers: { "Accept": "application/json" } });
+      if (!response.ok) throw new Error(`Directory search failed (${response.status}). Please try again.`);
+      const data = await response.json();
+      if (currentRequest === requestNumber) renderRows(data);
+    } catch (error) {
+      if (currentRequest !== requestNumber) return;
+      errorElement.textContent = error.message;
+      errorElement.hidden = false;
+      countElement.textContent = "Could not load personnel.";
+    }
+  }
+
+  async function loadDistricts() {
+    districtSelect.replaceChildren(new Option("All districts", ""));
+    districtSelect.disabled = true;
+    if (!regionSelect.value) {
+      loadPersonnel();
+      return;
+    }
+    try {
+      const response = await fetch(`/personnel/districts?region=${encodeURIComponent(regionSelect.value)}`, {
+        headers: { "Accept": "application/json" }
+      });
+      if (!response.ok) throw new Error(`District list failed (${response.status}).`);
+      const districts = await response.json();
+      districts.forEach((district) => districtSelect.add(new Option(district.district_name, district.district_id)));
+      districtSelect.disabled = false;
+      offset = 0;
+      loadPersonnel();
+    } catch (error) {
+      errorElement.textContent = error.message;
+      errorElement.hidden = false;
+      countElement.textContent = "Could not load districts.";
+    }
+  }
+
+  function addSection(parent, heading, fields) {
+    const section = document.createElement("section");
+    section.className = "profile-section";
+    const title = document.createElement("h3");
+    title.textContent = heading;
+    section.appendChild(title);
+    const grid = document.createElement("div");
+    grid.className = "profile-fields";
+    fields.forEach(([label, value]) => {
+      const item = document.createElement("div");
+      item.className = "profile-field";
+      const small = document.createElement("small");
+      small.textContent = label;
+      const strong = document.createElement("strong");
+      strong.textContent = text(value);
+      item.append(small, strong);
+      grid.appendChild(item);
+    });
+    section.appendChild(grid);
+    parent.appendChild(section);
+    return section;
+  }
+
+  function renderProfile(data) {
+    const person = data.person;
+    profileTitle.textContent = [person.surname, person.other_names].filter(Boolean).join(" ");
+    profileContent.replaceChildren();
+    addSection(profileContent, "Personal details", [
+      ["Personnel ID", person.personnel_id],
+      ["Gender", person.gender],
+      ["Date of birth", person.date_of_birth],
+      ["Age at posting", person.age_at_posting],
+      ["Residential region", person.residential_region],
+      ["Residential district", person.residential_district]
+    ]);
+    addSection(profileContent, "Academic credentials", [
+      ["Qualification", person.qualification],
+      ["Institution", person.institution_attended],
+      ["Course of study", person.course_of_study]
+    ]);
+    addSection(profileContent, "Regional choices", [
+      ["Choice 1", person.choice_1_region],
+      ["Choice 2", person.choice_2_region],
+      ["Choice 3", person.choice_3_region],
+      ["Choice met", person.choice_rank_met ? `Choice ${person.choice_rank_met}` : "Outside selected choices"]
+    ]);
+    addSection(profileContent, "Posting and service", [
+      ["User agency", person.agency_name],
+      ["Agency category", person.category],
+      ["District", person.posting_district],
+      ["Region", person.posting_region],
+      ["Service cycle", person.service_cycle],
+      ["Service status", titleCase(person.service_status)],
+      ["Outcome date", person.outcome_date],
+      ["Outcome reason", person.reason]
+    ]);
+
+    const history = document.createElement("section");
+    history.className = "profile-section";
+    const heading = document.createElement("h3");
+    heading.textContent = "Verified monthly attendance & supervisor evaluations";
+    history.appendChild(heading);
+    const note = document.createElement("p");
+    note.className = "mut";
+    note.textContent = "District-verified and approved records only.";
+    history.appendChild(note);
+    if (!data.monthly.length) {
+      const empty = document.createElement("p");
+      empty.className = "empty-state";
+      empty.textContent = "No approved monthly attendance or evaluation records yet.";
+      history.appendChild(empty);
+    } else {
+      const wrapper = document.createElement("div");
+      wrapper.className = "scroll";
+      const table = document.createElement("table");
+      table.className = "profile-monthly";
+      const thead = document.createElement("thead");
+      const headerRow = document.createElement("tr");
+      ["Period", "Attendance review", "Reported", "Days present / expected", "Evaluation review", "Supervisor rating", "Evaluation comments"].forEach((label) => {
+        const th = document.createElement("th");
+        th.textContent = label;
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+      const tbody = document.createElement("tbody");
+      data.monthly.forEach((record) => {
+        const row = document.createElement("tr");
+        const period = record.reporting_period ? String(record.reporting_period).slice(0, 7) : "";
+        addCell(row, period);
+        addCell(row, record.attendance_status ? titleCase(record.attendance_status) : "—");
+        addCell(row, record.reported_for_duty === null ? "—" : record.reported_for_duty ? "Yes" : "No");
+        addCell(row, record.days_present === null ? "—" : `${record.days_present} / ${record.days_expected}`);
+        addCell(row, record.evaluation_status ? titleCase(record.evaluation_status) : "—");
+        addCell(row, record.rating);
+        addCell(row, record.comments);
+        tbody.appendChild(row);
+      });
+      table.appendChild(tbody);
+      wrapper.appendChild(table);
+      history.appendChild(wrapper);
+    }
+    profileContent.appendChild(history);
+  }
+
+  rowsElement.addEventListener("click", async (event) => {
+    const button = event.target.closest("button[data-personnel-id]");
+    if (!button) return;
+    profileError.hidden = true;
+    profileContent.replaceChildren();
+    profileTitle.textContent = "Loading profile…";
+    profile.showModal();
+    try {
+      const response = await fetch(`/personnel/${encodeURIComponent(button.dataset.personnelId)}`, {
+        headers: { "Accept": "application/json" }
+      });
+      if (!response.ok) throw new Error(response.status === 404 ? "Personnel record not found." : `Profile could not be loaded (${response.status}).`);
+      renderProfile(await response.json());
+    } catch (error) {
+      profileTitle.textContent = "Profile unavailable";
+      profileError.textContent = error.message;
+      profileError.hidden = false;
+    }
+  });
+  document.getElementById("profile-close").addEventListener("click", () => profile.close());
+  profile.addEventListener("click", (event) => {
+    if (event.target === profile) profile.close();
+  });
+
+  searchInput.addEventListener("input", () => {
+    offset = 0;
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(loadPersonnel, 250);
+  });
+  regionSelect.addEventListener("change", () => {
+    offset = 0;
+    loadDistricts();
+  });
+  [districtSelect, agencySelect, qualificationSelect, genderSelect, statusSelect].forEach((select) => {
+    select.addEventListener("change", () => {
+      offset = 0;
+      loadPersonnel();
+    });
+  });
+  previousButton.addEventListener("click", () => {
+    offset = Math.max(0, offset - limit);
+    loadPersonnel();
+  });
+  nextButton.addEventListener("click", () => {
+    offset += limit;
+    loadPersonnel();
+  });
+  loadPersonnel();
+})();
+</script>
+{% endblock %}

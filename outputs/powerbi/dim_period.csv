@@ -1,0 +1,13 @@
+reporting_period,period_no,is_open,period_label
+2026-11-01,1,True,Nov 2026
+2026-12-01,2,True,Dec 2026
+2027-01-01,3,True,Jan 2027
+2027-02-01,4,True,Feb 2027
+2027-03-01,5,True,Mar 2027
+2027-04-01,6,True,Apr 2027
+2027-05-01,7,True,May 2027
+2027-06-01,8,True,Jun 2027
+2027-07-01,9,True,Jul 2027
+2027-08-01,10,True,Aug 2027
+2027-09-01,11,True,Sep 2027
+2027-10-01,12,True,Oct 2027

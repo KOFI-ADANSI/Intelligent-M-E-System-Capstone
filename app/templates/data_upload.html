@@ -1,0 +1,104 @@
+{% extends "base.html" %}{% block body %}
+<div class="card">
+  <h1 class="page-title" style="margin: 0 0 8px;">Data Upload</h1>
+  <p class="mut" style="margin: 0 0 16px; max-width: 600px;">
+    Manage system reference data. Uploads never delete existing data. Every file is checked and you review results before saving.
+    <br>⚠ Ghana Card numbers are hashed; phone numbers are not stored.
+  </p>
+  <div class="gap-line"></div>
+  
+  <div class="kpi-grid">
+    <div class="kpi">
+      <b>{{counts.personnel}}</b>
+      <span class="label">Personnel</span>
+    </div>
+    <div class="kpi">
+      <b>{{counts.postings}}</b>
+      <span class="label">Postings</span>
+    </div>
+    <div class="kpi">
+      <b>{{counts.agencies}}</b>
+      <span class="label">User Agencies</span>
+    </div>
+    <div class="kpi">
+      <b>{{counts.districts}}</b>
+      <span class="label">Districts</span>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2 style="margin-top: 0;">1. User Agencies</h2>
+  <p class="mut">Register agencies or correct their category before assigning personnel.</p>
+  <p style="background: rgba(255,255,255,0.02); border: 1px solid var(--line); border-radius: 8px; padding: 10px; font-family: 'Courier New', monospace; font-size: 0.85rem; color: #a8c5e0; overflow-x: auto; margin: 12px 0;">
+    Columns: <strong>Agency Name</strong>, <strong>Category</strong> (Public, Private or Quasi)
+  </p>
+  
+  <a class="btn secondary" href="/hq/data/template/agencies.csv" style="margin-bottom: 12px;">📋 Download Template</a>
+  
+  <form method="post" action="/hq/data/preview" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{csrf}}">
+    <input type="hidden" name="kind" value="agencies">
+    <div style="display: flex; gap: 12px; align-items: flex-end;">
+      <div style="flex: 1; min-width: 240px;">
+        <input type="file" name="file" accept=".csv,.xlsx" required style="width: 100%; padding: 10px 12px;">
+      </div>
+      <button type="submit">📂 Check file</button>
+    </div>
+  </form>
+</div>
+
+<div class="card">
+  <h2 style="margin-top: 0;">2. Personnel and Postings</h2>
+  <p class="mut">Upload the NSS posting sheet with personnel records and their postings to districts.</p>
+  <p style="background: rgba(255,255,255,0.02); border: 1px solid var(--line); border-radius: 8px; padding: 10px; font-family: 'Courier New', monospace; font-size: 0.8rem; color: #a8c5e0; overflow-x: auto; margin: 12px 0; line-height: 1.4;">
+    Columns: <strong>Personnel ID</strong>, <strong>Surname</strong>, <strong>Other Names</strong>, <strong>Gender</strong>, <strong>DOB</strong>, <strong>Age</strong>, <strong>Contact</strong>, <strong>Ghana Card</strong>, <strong>Residential Region</strong>, <strong>Residential District</strong>, <strong>Institution</strong>, <strong>Course</strong>, <strong>Qualification</strong>, <strong>Region Choice 1–3</strong>, <strong>Place of Posting</strong>, <strong>Category</strong>, <strong>Region Posted</strong>, <strong>District Posted</strong>
+  </p>
+  <p class="mut" style="margin: 8px 0 12px; font-size: 0.9rem;">
+    • Dates: yyyy-mm-dd or dd/mm/yyyy<br>
+    • .xlsx files can include a <strong>Region District Lookup</strong> sheet to add new districts<br>
+    • Large files (50K+ rows) take 1–2 minutes to validate
+  </p>
+  
+  <a class="btn secondary" href="/hq/data/template/postings.csv" style="margin-bottom: 12px;">📋 Download Template</a>
+  
+  <form method="post" action="/hq/data/preview" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{csrf}}">
+    <input type="hidden" name="kind" value="postings">
+    <div style="display: flex; gap: 12px; align-items: flex-end;">
+      <div style="flex: 1; min-width: 240px;">
+        <input type="file" name="file" accept=".csv,.xlsx" required style="width: 100%; padding: 10px 12px;">
+      </div>
+      <button type="submit">📂 Check file</button>
+    </div>
+  </form>
+</div>
+
+{% if recent %}
+<div class="card scroll">
+  <h2 style="margin-top: 0;">Recent Uploads</h2>
+  <div class="gap-line"></div>
+  <table>
+    <thead>
+      <tr>
+        <th>Timestamp</th>
+        <th>Uploaded By</th>
+        <th>Type</th>
+        <th>Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in recent %}
+      <tr>
+        <td style="font-family: 'Courier New', monospace; font-size: 0.85rem;">{{r.at.strftime('%Y-%m-%d %H:%M')}}</td>
+        <td style="font-weight: 600;">{{r.username}}</td>
+        <td><span class="pill">{{ 'Agencies' if r.action=='UPLOAD_AGENCIES' else 'Personnel & Postings' }}</span></td>
+        <td style="color: var(--mut); font-size: 0.9rem;">{{r.detail}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% endblock %}

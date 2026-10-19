@@ -1,0 +1,79 @@
+{% extends "base.html" %}{% block body %}
+<div class="card">
+  <div class="page-header">
+    <h1 class="page-title" style="flex: 1;">Attendance & Supervisor Evaluation</h1>
+    <div class="toolbar">
+      <form method="get">
+        <select name="period" onchange="this.form.submit()" style="min-width: 160px;">
+          {% for p in periods %}<option value="{{p.reporting_period}}" {{'selected' if p.reporting_period==period.reporting_period}}>{{p.reporting_period|mon}} {{'(closed)' if not p.is_open else ''}}</option>{% endfor %}
+        </select>
+      </form>
+    </div>
+  </div>
+  <div class="gap-line"></div>
+  
+  <p class="mut" style="margin: 0 0 12px; font-size: 0.95rem;">
+    Enter attendance days and supervisor ratings for {{period.reporting_period|mon}}.<br>
+    • <strong>Save</strong> keeps a draft • <strong>Submit</strong> sends to district office for verification
+  </p>
+  
+  {% if not period.is_open %}
+  <div class="err" role="alert">⏸ This period is closed for new entries.</div>
+  {% endif %}
+</div>
+
+<form method="post" class="card scroll">
+  <input type="hidden" name="csrf" value="{{csrf}}">
+  <input type="hidden" name="period" value="{{period.reporting_period}}">
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Personnel ID</th>
+        <th>Name</th>
+        <th style="text-align: center;">Reported</th>
+        <th style="text-align: center;">Days Expected</th>
+        <th style="text-align: center;">Days Present</th>
+        <th style="text-align: center;">Rating (1–5)</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      {% set ed = period.is_open and r.ar_status in editable_states %}
+      <tr>
+        <td style="font-family: 'Courier New', monospace; font-weight: 600;">{{r.personnel_id}}<input type="hidden" name="pid" value="{{r.personnel_id}}"></td>
+        <td style="font-weight: 500;">{{r.surname}} {{r.other_names}}</td>
+        <td style="text-align: center;">
+          <input type="checkbox" name="rep_{{r.personnel_id}}" value="1" {{'checked' if r.reported_for_duty or r.reported_for_duty is none}} {{'' if ed else 'disabled'}} style="cursor: pointer; width: 18px; height: 18px;">
+        </td>
+        <td style="text-align: center;">
+          <input class="n" name="exp_{{r.personnel_id}}" value="{{r.days_expected if r.days_expected is not none}}" {{'' if ed else 'disabled'}} style="text-align: center;">
+        </td>
+        <td style="text-align: center;">
+          <input class="n" name="pre_{{r.personnel_id}}" value="{{r.days_present if r.days_present is not none}}" {{'' if ed else 'disabled'}} style="text-align: center;">
+        </td>
+        <td style="text-align: center;">
+          <input class="n" name="rat_{{r.personnel_id}}" value="{{r.rating if r.rating is not none}}" {{'' if ed else 'disabled'}} style="text-align: center;">
+        </td>
+        <td>
+          {% if r.ar_status %}
+          <span class="pill {{r.ar_status}}">{{r.ar_status}}</span>
+          {% if r.reject_reason %}
+          <div class="R" style="margin-top: 6px; font-size: 0.85rem;">{{r.reject_reason}}</div>
+          {% endif %}
+          {% else %}
+          <span class="mut">—</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+  <div style="display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap;">
+    <button type="submit" name="action" value="save" class="btn secondary">📝 Save as Draft</button>
+    <button type="submit" name="action" value="submit" class="btn">✓ Submit for Verification</button>
+  </div>
+</form>
+{% endblock %}

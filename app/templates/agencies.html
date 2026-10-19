@@ -1,0 +1,279 @@
+{% extends "base.html" %}{% block title %}User Agencies · NS M&E{% endblock %}{% block body %}
+<section aria-labelledby="agencies-title">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title" id="agencies-title">User Agencies</h1>
+      <p class="mut" style="margin: 6px 0 0;">Explore hosting agencies and the personnel and locations in your area.</p>
+    </div>
+  </div>
+
+  <div class="card agency-directory">
+    <label class="agency-search">
+      <span>Search agencies</span>
+      <input id="agency-search" type="search" autocomplete="off" placeholder="Agency name, sector, region or district" aria-label="Search agencies by name, sector, region, or district">
+    </label>
+
+    <div class="agency-toolbar">
+      <div class="category-tabs" role="group" aria-label="Filter agencies by category">
+        <button type="button" class="category-tab active" data-category="" aria-pressed="true">All Categories</button>
+        <button type="button" class="category-tab" data-category="Public" aria-pressed="false">Public Sector</button>
+        <button type="button" class="category-tab" data-category="Private" aria-pressed="false">Private Sector</button>
+        <button type="button" class="category-tab" data-category="Quasi" aria-pressed="false">Quasi-Government</button>
+      </div>
+      <label class="region-filter">Operating region
+        <select id="agency-region">
+          <option value="">All regions</option>
+          {% for row in regions %}<option value="{{row.region_name}}">{{row.region_name}}</option>{% endfor %}
+        </select>
+      </label>
+    </div>
+
+    <div class="agency-results-header">
+      <p id="agency-result-count" class="mut" role="status" aria-live="polite">Loading agencies…</p>
+      <div class="view-toggle" role="group" aria-label="Choose agency view">
+        <button type="button" id="cards-view" class="sec active" aria-pressed="true">Cards</button>
+        <button type="button" id="table-view" class="sec" aria-pressed="false">Table</button>
+      </div>
+    </div>
+    <p id="agency-error" class="err" role="alert" hidden></p>
+    <div id="agency-empty" class="empty-state" hidden>No agencies match this search and these filters.</div>
+    <div id="agency-cards" class="agency-cards"></div>
+    <div id="agency-table-wrap" class="scroll" hidden>
+      <table class="agency-table">
+        <thead>
+          <tr><th>Agency</th><th>Category</th><th style="text-align: center;">Personnel</th><th style="text-align: center;">Active sites</th><th>Operating regions</th><th></th></tr>
+        </thead>
+        <tbody id="agency-table-rows"></tbody>
+      </table>
+    </div>
+    <div class="agency-pagination">
+      <button id="agency-previous" type="button" class="sec" disabled>Previous</button>
+      <span id="agency-page" class="mut"></span>
+      <button id="agency-next" type="button" disabled>Next</button>
+    </div>
+  </div>
+</section>
+
+<style>
+.agency-directory { padding: 22px; }
+.agency-search { display: grid; gap: 7px; max-width: 680px; font-weight: 700; }
+.agency-search input { width: 100%; min-height: 46px; }
+.agency-toolbar { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin: 20px 0 12px; }
+.category-tabs { display: flex; gap: 7px; flex-wrap: wrap; padding: 5px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.025); }
+.category-tab { padding: 8px 12px; color: var(--mut); background: transparent; border: 1px solid transparent; border-radius: 8px; font-size: .88rem; }
+.category-tab.active { color: #fff; background: var(--acc-strong); }
+.region-filter { display: grid; gap: 6px; min-width: 190px; font-size: .85rem; font-weight: 700; color: #dfeeff; }
+.region-filter select { width: 100%; }
+.agency-results-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 50px; }
+.agency-results-header p { margin: 8px 0; }
+.view-toggle { display: flex; gap: 6px; }
+.view-toggle button { padding: 7px 11px; }
+.view-toggle button.active { background: var(--acc-strong); color: #fff; }
+.agency-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+.agency-cards[hidden] { display: none; }
+.agency-card { display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 17px; border: 1px solid var(--line); border-radius: 13px; background: rgba(255,255,255,.025); }
+.agency-card-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.agency-card-heading h2 { font-size: 1.05rem; overflow-wrap: anywhere; }
+.agency-category { min-width: 0; }
+.agency-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.agency-stat { padding: 10px; border-radius: 9px; background: rgba(90,166,255,.06); }
+.agency-stat strong { display: block; font-size: 1.2rem; }
+.agency-stat span { color: var(--mut); font-size: .82rem; }
+.agency-regions { min-height: 42px; color: var(--mut); font-size: .9rem; overflow-wrap: anywhere; }
+.agency-personnel-link { width: 100%; margin-top: auto; }
+.agency-table td { min-width: 100px; }
+.agency-table td:first-child { min-width: 180px; font-weight: 700; }
+.agency-pagination { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: 18px; }
+.agency-pagination button { min-width: 104px; }
+@media (max-width: 760px) {
+  .agency-directory { padding: 15px; }
+  .agency-toolbar { align-items: stretch; flex-direction: column; }
+  .region-filter { min-width: 0; }
+}
+@media (max-width: 480px) {
+  .agency-results-header { align-items: flex-start; flex-direction: column; padding: 8px 0; }
+  .category-tab { flex: 1 1 44%; }
+}
+</style>
+
+<script>
+(() => {
+  const searchInput = document.getElementById("agency-search");
+  const regionSelect = document.getElementById("agency-region");
+  const countElement = document.getElementById("agency-result-count");
+  const errorElement = document.getElementById("agency-error");
+  const emptyElement = document.getElementById("agency-empty");
+  const cardsElement = document.getElementById("agency-cards");
+  const tableWrap = document.getElementById("agency-table-wrap");
+  const tableRows = document.getElementById("agency-table-rows");
+  const previousButton = document.getElementById("agency-previous");
+  const nextButton = document.getElementById("agency-next");
+  const pageLabel = document.getElementById("agency-page");
+  const categoryTabs = Array.from(document.querySelectorAll(".category-tab"));
+  const cardsButton = document.getElementById("cards-view");
+  const tableButton = document.getElementById("table-view");
+  const limit = 50;
+  let category = "";
+  let offset = 0;
+  let view = "cards";
+  let timer;
+  let requestNumber = 0;
+
+  function appendCell(row, value, centered) {
+    const cell = document.createElement("td");
+    cell.textContent = value === null || value === undefined || value === "" ? "—" : String(value);
+    if (centered) cell.style.textAlign = "center";
+    row.appendChild(cell);
+    return cell;
+  }
+
+  function categoryBadge(value) {
+    const badge = document.createElement("span");
+    badge.className = "pill agency-category";
+    badge.textContent = value === "Quasi" ? "Quasi-Government" : `${value} Sector`;
+    return badge;
+  }
+
+  function personnelLink(agency) {
+    const link = document.createElement("a");
+    link.className = "btn agency-personnel-link";
+    link.href = `/personnel?agency_id=${encodeURIComponent(agency.agency_id)}`;
+    link.textContent = `View ${agency.headcount} personnel`;
+    return link;
+  }
+
+  function renderCards(agencies) {
+    cardsElement.replaceChildren();
+    agencies.forEach((agency) => {
+      const card = document.createElement("article");
+      card.className = "agency-card";
+      const heading = document.createElement("div");
+      heading.className = "agency-card-heading";
+      const name = document.createElement("h2");
+      name.textContent = agency.agency_name;
+      heading.appendChild(name);
+      heading.appendChild(categoryBadge(agency.category));
+      card.appendChild(heading);
+
+      const stats = document.createElement("div");
+      stats.className = "agency-stats";
+      [[agency.headcount, "Hosted personnel"], [agency.active_sites, "Active posting sites"]].forEach(([value, label]) => {
+        const stat = document.createElement("div");
+        stat.className = "agency-stat";
+        const strong = document.createElement("strong");
+        strong.textContent = String(value);
+        const caption = document.createElement("span");
+        caption.textContent = label;
+        stat.append(strong, caption);
+        stats.appendChild(stat);
+      });
+      card.appendChild(stats);
+
+      const regions = document.createElement("div");
+      regions.className = "agency-regions";
+      regions.textContent = `Operating regions (${agency.region_count}): ${agency.operating_regions || "—"}`;
+      card.appendChild(regions);
+      card.appendChild(personnelLink(agency));
+      cardsElement.appendChild(card);
+    });
+  }
+
+  function renderTable(agencies) {
+    tableRows.replaceChildren();
+    agencies.forEach((agency) => {
+      const row = document.createElement("tr");
+      appendCell(row, agency.agency_name);
+      const category = document.createElement("td");
+      category.appendChild(categoryBadge(agency.category));
+      row.appendChild(category);
+      appendCell(row, agency.headcount, true);
+      appendCell(row, agency.active_sites, true);
+      appendCell(row, agency.operating_regions);
+      const action = document.createElement("td");
+      action.appendChild(personnelLink(agency));
+      row.appendChild(action);
+      tableRows.appendChild(row);
+    });
+  }
+
+  function setView(nextView) {
+    view = nextView;
+    const cardsActive = view === "cards";
+    cardsElement.hidden = !cardsActive;
+    tableWrap.hidden = cardsActive;
+    cardsButton.classList.toggle("active", cardsActive);
+    tableButton.classList.toggle("active", !cardsActive);
+    cardsButton.setAttribute("aria-pressed", String(cardsActive));
+    tableButton.setAttribute("aria-pressed", String(!cardsActive));
+  }
+
+  function renderResults(data) {
+    renderCards(data.agencies);
+    renderTable(data.agencies);
+    const first = data.total ? data.offset + 1 : 0;
+    const last = Math.min(data.offset + data.agencies.length, data.total);
+    countElement.textContent = `Showing ${first}–${last} of ${data.total} agencies`;
+    pageLabel.textContent = data.total ? `Page ${Math.floor(data.offset / limit) + 1} of ${Math.ceil(data.total / limit)}` : "";
+    previousButton.disabled = data.offset <= 0;
+    nextButton.disabled = data.offset + data.agencies.length >= data.total;
+    emptyElement.hidden = data.agencies.length > 0;
+  }
+
+  async function loadAgencies() {
+    const current = ++requestNumber;
+    errorElement.hidden = true;
+    countElement.textContent = "Loading agencies…";
+    const params = new URLSearchParams({
+      q: searchInput.value.trim(),
+      category,
+      region: regionSelect.value,
+      offset: String(offset),
+      limit: String(limit)
+    });
+    try {
+      const response = await fetch(`/agencies/search?${params}`, { headers: { "Accept": "application/json" } });
+      if (!response.ok) throw new Error(`Agency search failed (${response.status}). Please try again.`);
+      const data = await response.json();
+      if (current === requestNumber) renderResults(data);
+    } catch (error) {
+      if (current !== requestNumber) return;
+      errorElement.textContent = error.message;
+      errorElement.hidden = false;
+      countElement.textContent = "Could not load agencies.";
+    }
+  }
+
+  searchInput.addEventListener("input", () => {
+    offset = 0;
+    clearTimeout(timer);
+    timer = setTimeout(loadAgencies, 250);
+  });
+  regionSelect.addEventListener("change", () => {
+    offset = 0;
+    loadAgencies();
+  });
+  categoryTabs.forEach((tab) => tab.addEventListener("click", () => {
+    category = tab.dataset.category;
+    categoryTabs.forEach((item) => {
+      const active = item === tab;
+      item.classList.toggle("active", active);
+      item.setAttribute("aria-pressed", String(active));
+    });
+    offset = 0;
+    loadAgencies();
+  }));
+  cardsButton.addEventListener("click", () => setView("cards"));
+  tableButton.addEventListener("click", () => setView("table"));
+  previousButton.addEventListener("click", () => {
+    offset = Math.max(0, offset - limit);
+    loadAgencies();
+  });
+  nextButton.addEventListener("click", () => {
+    offset += limit;
+    loadAgencies();
+  });
+  setView("cards");
+  loadAgencies();
+})();
+</script>
+{% endblock %}

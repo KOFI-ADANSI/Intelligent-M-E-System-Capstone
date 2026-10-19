@@ -1,0 +1,119 @@
+{% extends "base.html" %}{% block title %}Dashboard · National Service M&E{% endblock %}{% block body %}
+<section class="card dashboard-hero" aria-labelledby="dashboard-title">
+  <div>
+    <p class="dashboard-eyebrow">Performance Monitoring Dashboard</p>
+    <h1 class="page-title" id="dashboard-title">{% if u.role=='AGENCY' %}{{u.agency_name}} — {{u.district_name}}{% elif u.role=='DISTRICT' %}{{u.district_name}} District Overview{% elif u.role=='REGION' %}{{u.region_name}} Regional Overview{% else %}National Headquarters (HQ) Overview{% endif %}</h1>
+  </div>
+  <form method="get" class="cycle-picker">
+    <label for="dashboard-period">Reporting Cycle:</label>
+    <select id="dashboard-period" name="period" onchange="this.form.submit()">
+      {% for p in periods %}<option value="{{p.reporting_period}}" {{'selected' if p.reporting_period==period.reporting_period}}>{{p.reporting_period|mon}} {{'(Open)' if p.is_open else '(Closed)'}}</option>{% endfor %}
+    </select>
+  </form>
+</section>
+
+<nav class="dashboard-links" aria-label="Dashboard shortcuts">
+  {% if u.role=='HQ' %}
+    <a class="dashboard-link gold" href="/hq/powerbi"><span class="dashboard-link-icon" aria-hidden="true">▥</span><span><strong>Power BI Dashboard</strong><small>National, regional &amp; district M&amp;E</small></span></a>
+    <a class="dashboard-link" href="/personnel"><span class="dashboard-link-icon" aria-hidden="true">♙</span><span><strong>Personnel Directory</strong><small>Search and filter NSP records</small></span></a>
+    <a class="dashboard-link green" href="/agencies"><span class="dashboard-link-icon" aria-hidden="true">▦</span><span><strong>User Agencies</strong><small>Browse partner posting sites</small></span></a>
+    <a class="dashboard-link gold" href="/review"><span class="dashboard-link-icon" aria-hidden="true">☑</span><span><strong>Review Queue</strong><small>Verify returns and outcomes</small></span></a>
+  {% elif u.role in ('DISTRICT','REGION') %}
+    <a class="dashboard-link gold" href="/review"><span class="dashboard-link-icon" aria-hidden="true">☑</span><span><strong>Review Queue</strong><small>Review submissions awaiting action</small></span></a>
+    <a class="dashboard-link" href="/visits/new"><span class="dashboard-link-icon" aria-hidden="true">＋</span><span><strong>Record Visit</strong><small>Log a monitoring visit</small></span></a>
+    <a class="dashboard-link" href="/personnel"><span class="dashboard-link-icon" aria-hidden="true">♙</span><span><strong>Personnel Directory</strong><small>Browse personnel in your remit</small></span></a>
+    <a class="dashboard-link green" href="/agencies"><span class="dashboard-link-icon" aria-hidden="true">▦</span><span><strong>User Agencies</strong><small>Browse partner posting sites</small></span></a>
+  {% else %}
+    <a class="dashboard-link" href="/agency/returns?period={{period.reporting_period}}"><span class="dashboard-link-icon" aria-hidden="true">☷</span><span><strong>Attendance &amp; Evaluation</strong><small>Enter or update this cycle's returns</small></span></a>
+    <a class="dashboard-link gold" href="/agency/upload?period={{period.reporting_period}}"><span class="dashboard-link-icon" aria-hidden="true">⇧</span><span><strong>Upload Returns</strong><small>Submit attendance from a CSV file</small></span></a>
+    <a class="dashboard-link green" href="/agency/completion"><span class="dashboard-link-icon" aria-hidden="true">✓</span><span><strong>Service Outcomes</strong><small>Propose personnel outcomes</small></span></a>
+    <a class="dashboard-link" href="/personnel"><span class="dashboard-link-icon" aria-hidden="true">♙</span><span><strong>Personnel Directory</strong><small>Browse personnel at your site</small></span></a>
+  {% endif %}
+</nav>
+
+{% if u.role=='AGENCY' %}
+<section class="card dashboard-panel">
+  <div class="dashboard-panel-heading">
+    <div><h2>{{period.reporting_period|mon}} Attendance Returns</h2><p>Site headcount: <strong>{{headcount}}</strong>{% if period.agency_deadline %} · Deadline: <strong>{{period.agency_deadline}}</strong>{% endif %}</p></div>
+    <a class="btn" href="/agency/returns?period={{period.reporting_period}}">Open Attendance &amp; Evaluation</a>
+  </div>
+  {% if by_status %}
+  <div class="scroll">
+    <table class="dashboard-table">
+      <thead><tr><th>Status</th><th>Attendance returns</th></tr></thead>
+      <tbody>{% for r in by_status %}<tr><td><span class="pill {{r.status}}">{{r.status}}</span></td><td>{{r.n}}</td></tr>{% endfor %}</tbody>
+    </table>
+  </div>
+  {% else %}<p class="empty-state">Nothing entered yet for this reporting period.</p>{% endif %}
+</section>
+
+{% if rejected %}
+<section class="card dashboard-panel">
+  <h2 style="color:var(--r);">Sent Back for Correction ({{rejected|length}})</h2>
+  <div class="scroll">
+    <table class="dashboard-table">
+      <thead><tr><th>Personnel ID</th><th>Rejection reason</th></tr></thead>
+      <tbody>{% for r in rejected %}<tr><td>{{r.personnel_id}}</td><td>{{r.reject_reason}}</td></tr>{% endfor %}</tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+
+<section class="card dashboard-panel">
+  <div class="dashboard-panel-heading"><div><h2>Service Outcome Proposals</h2><p>Submission status for your site's personnel</p></div><a class="btn secondary" href="/agency/completion">Open Service Outcomes</a></div>
+  {% if comp_status %}
+  <div class="scroll">
+    <table class="dashboard-table">
+      <thead><tr><th>Status</th><th>Personnel</th></tr></thead>
+      <tbody>{% for r in comp_status %}<tr><td><span class="pill {{r.status}}">{{r.status}}</span></td><td>{{r.n}}</td></tr>{% endfor %}</tbody>
+    </table>
+  </div>
+  {% else %}<p class="empty-state">No service outcomes have been submitted yet.</p>{% endif %}
+</section>
+
+{% else %}
+<section class="card dashboard-panel" aria-labelledby="pending-title">
+  <div class="dashboard-panel-heading">
+    <div><h2 id="pending-title">Pending Action Items</h2><p>Submissions currently awaiting your level's verification or approval</p></div>
+    <a class="btn" href="/review">Open Review Queue</a>
+  </div>
+  <div class="dashboard-counts">
+    <div class="dashboard-count attendance"><span>Attendance Returns</span><strong>{{pending.returns}}</strong></div>
+    <div class="dashboard-count outcomes"><span>Service Outcomes</span><strong>{{pending.completion}}</strong></div>
+    {% if pending.visits is defined %}<div class="dashboard-count"><span>Monitoring Visits</span><strong>{{pending.visits}}</strong></div>{% endif %}
+  </div>
+</section>
+
+{% if u.role=='HQ' and kpis %}
+<section class="card dashboard-panel scroll">
+  <div class="dashboard-panel-heading"><div><h2>National Performance Indicators by Month</h2><p>District classifications based on approved M&amp;E data across Ghana</p></div></div>
+  <table class="dashboard-table">
+    <thead><tr><th>Cycle Month</th><th class="G">Green Districts<br>(≥95%)</th><th class="Y">Yellow Districts<br>(80–&lt;95%)</th><th class="R">Red Districts<br>(&lt;80%)</th><th>National Mean Composite</th></tr></thead>
+    <tbody>
+    {% for k in kpis %}<tr><td>{{k.reporting_period|mon}}</td><td class="G">{{k.districts_green}}</td><td class="Y">{{k.districts_yellow}}</td><td class="R">{{k.districts_red}}</td><td>{% if k.mean_composite is not none %}{{k.mean_composite}}%{% else %}—{% endif %}</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+
+<section class="card dashboard-panel scroll">
+  <div class="dashboard-panel-heading"><div><h2>District Scorecard — {{period.reporting_period|mon}}</h2><p>Approved M&amp;E indicators aggregated at district level</p></div></div>
+  {% if score %}
+  <table class="dashboard-table">
+    <thead><tr><th>Region</th><th>District Name</th><th class="G">Green Indicators</th><th class="Y">Yellow</th><th class="R">Red</th><th>Composite Achievement</th></tr></thead>
+    <tbody>
+      {% for s in score %}
+        {% set achievement = s.composite_achievement|default(0, true)|float %}
+        {% set classification = 'red' if achievement < 80 else ('yellow' if achievement < 95 else 'green') %}
+        <tr>
+          <td>{{s.region_name}}</td><td>{{s.district_name}}</td>
+          <td class="G">{{s.n_green}}</td><td class="Y">{{s.n_yellow}}</td><td class="R">{{s.n_red}}</td>
+          <td><span class="score-track {{classification}}" role="meter" aria-label="Composite achievement" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{achievement}}"><span style="width:{{[[achievement, 100]|min, 0]|max}}%"></span></span>{{'%.2f'|format(achievement)}}%</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<p class="empty-state">No approved data is available for this period yet.</p>{% endif %}
+</section>
+{% endif %}
+{% endblock %}

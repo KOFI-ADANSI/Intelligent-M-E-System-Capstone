@@ -1,0 +1,8 @@
+indicator_id,indicator_name,result_level,unit,baseline_val,target_val,green_threshold,yellow_threshold
+IND01,Deployment (reporting-for-duty) rate,OUTPUT,%,70.00,98.00,95.00,80.00
+IND02,Monitoring visits per 100 active personnel,ACTIVITY,visits/100,15.00,30.00,95.00,80.00
+IND03,Supervisor evaluation submission rate,OUTPUT,%,60.00,90.00,95.00,80.00
+IND04,Average attendance rate,OUTPUT,%,80.00,90.00,95.00,80.00
+IND05,Mean supervisor rating (1-5),OUTCOME,score,3.00,4.00,95.00,80.00
+IND06,Service retention / completion rate,OUTCOME,%,85.00,95.00,95.00,80.00
+IND07,Attendance-return submission compliance,OUTPUT,%,50.00,95.00,95.00,80.00

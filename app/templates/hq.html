@@ -1,0 +1,146 @@
+{% extends "base.html" %}{% block body %}
+<div class="card">
+  <div class="page-header">
+    <h1 class="page-title">HQ & Analytics</h1>
+  </div>
+  <div class="gap-line"></div>
+  
+  <div class="kpi-grid">
+    <div class="kpi">
+      <b>{{counts.approved_returns}}</b>
+      <span class="label">Approved Returns</span>
+    </div>
+    <div class="kpi">
+      <b>{{counts.visits}}</b>
+      <span class="label">Approved Visits</span>
+    </div>
+    <div class="kpi">
+      <b>{{counts.certified}}</b>
+      <span class="label">Certified Outcomes</span>
+    </div>
+  </div>
+  
+  <div style="margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line);">
+    <form method="post" action="/hq/refresh" style="display: inline;">
+      <input type="hidden" name="csrf_token" value="{{csrf}}">
+      <button type="submit" {{'disabled' if refresh.running}} style="font-weight: 700; min-width: 220px;">
+        {{'⏳ Running…' if refresh.running else '🔄 Refresh Indicators & Models'}}
+      </button>
+    </form>
+    <p class="mut" style="margin: 12px 0 0; font-size: 0.9rem;">Recalculates every indicator from approved records only, then re-runs logistic regression and early-warning models if sufficient data exist.</p>
+    {% if refresh.finished %}
+      <div style="margin-top: 16px; padding: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--line); border-radius: 10px;">
+        <p class="mut" style="margin: 0 0 8px; font-size: 0.85rem;">
+          Last refresh: <strong>{{refresh.finished.strftime('%H:%M:%S')}}</strong> — <span class="{{'G' if refresh.ok else 'R'}}">{{ '✓ OK' if refresh.ok else '✗ FAILED' }}</span>
+        </p>
+        <pre style="margin: 0; font-size: 12px; overflow-x: auto; max-height: 220px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 6px; color: #a8c5e0;">{{refresh.log}}</pre>
+      </div>
+    {% endif %}
+  </div>
+</div>
+<div class="card">
+  <h2 style="margin-top: 0;">Power BI Dashboard</h2>
+  <p class="mut">Open the project report and its latest exported Power BI data tables.</p>
+  <a class="btn" href="/hq/powerbi">Open Power BI report hub</a>
+</div>
+<div class="card scroll" id="reporting-periods">
+  <h2 style="margin-top: 0;">Reporting Periods</h2>
+  <div class="gap-line"></div>
+  <table>
+    <thead>
+      <tr>
+        <th>Period</th>
+        <th>Agency Deadline</th>
+        <th>Status</th>
+        <th style="text-align: center;">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in periods %}
+      <tr>
+        <td style="font-weight: 600;">{{p.reporting_period|mon}}</td>
+        <td>{{p.agency_deadline}}</td>
+        <td>
+          <span class="pill {{'APPROVED' if p.is_open else 'REJECTED'}}">
+            {{ 'Open' if p.is_open else 'Closed' }}
+          </span>
+        </td>
+        <td style="text-align: center;">
+          <form method="post" action="/hq/period" style="margin:0; display:inline;">
+            <input type="hidden" name="csrf_token" value="{{csrf}}">
+            <input type="hidden" name="period" value="{{p.reporting_period}}">
+            <input type="hidden" name="open_" value="{{0 if p.is_open else 1}}">
+            <button class="sec" style="font-size: 0.9rem; padding: 6px 10px;">
+              {{ '⏸ Close' if p.is_open else '▶ Re-open' }}
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if logit %}
+<div class="card scroll">
+  <h2 style="margin-top: 0;">Logistic Regression — Odds Ratios for Completing Service</h2>
+  <p class="mut" style="margin: 4px 0 12px; font-size: 0.9rem;">Associations in observational data, not causal effects. Use for decision support only.</p>
+  <div class="gap-line"></div>
+  <table>
+    <thead>
+      <tr>
+        <th>Model</th>
+        <th>Term</th>
+        <th style="text-align: center;">OR</th>
+        <th style="text-align: center;">95% CI</th>
+        <th style="text-align: center;">p-value</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in logit %}
+      <tr>
+        <td style="font-weight: 600;">{{r.model_name}}</td>
+        <td>{{r.term}}</td>
+        <td style="text-align: center; font-weight: 700;">{{r.odds_ratio}}</td>
+        <td style="text-align: center;">{{r.or_ci_low}}–{{r.or_ci_high}}</td>
+        <td style="text-align: center; font-size: 0.9rem;">{{r.p_value}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% if risk %}
+<div class="card scroll">
+  <h2 style="margin-top: 0;">Early-Warning List (Latest Period)</h2>
+  <p class="mut" style="margin: 4px 0 12px; font-size: 0.9rem;">Decision support only — not an administrative decision.</p>
+  <div class="gap-line"></div>
+  <table>
+    <thead>
+      <tr>
+        <th>Region</th>
+        <th>District</th>
+        <th style="text-align: center;">Risk Probability</th>
+        <th style="text-align: center;">Risk Class</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in risk %}
+      <tr>
+        <td>{{r.region_name}}</td>
+        <td>{{r.district_name}}</td>
+        <td style="text-align: center; font-weight: 600;">{{r.risk_probability}}</td>
+        <td style="text-align: center;">
+          <span class="pill {{'REJECTED' if r.risk_class=='HIGH' else 'SUBMITTED' if r.risk_class=='MEDIUM' else 'APPROVED'}}">
+            {{r.risk_class}}
+          </span>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% endblock %}

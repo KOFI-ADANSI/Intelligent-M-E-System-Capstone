@@ -1,0 +1,29 @@
+{% extends "base.html" %}{% block body %}
+<div class="card scroll">
+  <h1 class="page-title" style="margin: 0 0 8px;">Audit Log</h1>
+  <p class="mut" style="margin: 0 0 16px;">Latest 200 system events — showing user actions and record changes.</p>
+  <div class="gap-line"></div>
+  <table>
+    <thead>
+      <tr>
+        <th>Timestamp</th>
+        <th>User</th>
+        <th>Action</th>
+        <th>Table</th>
+        <th>Details</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td style="font-family: 'Courier New', monospace; font-size: 0.85rem;">{{r.at.strftime('%Y-%m-%d %H:%M')}}</td>
+        <td style="font-weight: 600;">{{r.username}}</td>
+        <td><span class="pill">{{r.action}}</span></td>
+        <td style="font-weight: 600;">{{r.table_name}}</td>
+        <td style="color: var(--mut); font-size: 0.9rem; max-width: 320px; overflow: hidden; text-overflow: ellipsis;">{{r.detail}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

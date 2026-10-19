@@ -1,0 +1,21 @@
+{% extends "base.html" %}{% block body %}
+<section class="card login-wrap login-card" aria-labelledby="login-title">
+  <div class="page-header">
+    <h1 class="page-title" id="login-title">Sign In</h1>
+  </div>
+  <p class="mut" style="margin: 0 0 20px; max-width: 470px;">Enter your National Service M&E account credentials to access the system.</p>
+  {% if err %}<div class="err login-error" id="login-error" role="alert">{{err}}</div>{% endif %}
+  
+  <form class="login-form" method="post" action="/login">
+    <label>
+      <span style="font-weight: 700; color: #dfeeff;">Username</span>
+      <input name="username" type="text" autocomplete="username" required autofocus {% if err %}aria-describedby="login-error"{% endif %} placeholder="Enter username">
+    </label>
+    <label>
+      <span style="font-weight: 700; color: #dfeeff;">Password</span>
+      <input name="password" type="password" autocomplete="current-password" required {% if err %}aria-describedby="login-error"{% endif %} placeholder="Enter password">
+    </label>
+    <button type="submit" style="margin-top: 8px;">Sign In</button>
+  </form>
+</section>
+{% endblock %}

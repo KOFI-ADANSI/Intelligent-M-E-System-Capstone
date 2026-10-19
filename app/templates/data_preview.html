@@ -1,0 +1,185 @@
+{% extends "base.html" %}{% block body %}
+{% set c = res.counts %}{% set pp = res.kind == 'postings' %}
+
+<div class="card">
+  <h1 class="page-title" style="margin: 0 0 8px;">Check Results: {{res.filename}}</h1>
+  <p class="mut" style="margin: 0 0 12px;">
+    {{ 'Personnel & Postings' if pp else 'User Agencies' }} · <strong>{{res.n_rows}} rows</strong> • 
+    <span style="color: #fbbf24;">⚠ Nothing has been saved yet</span>
+  </p>
+  <div class="gap-line"></div>
+
+  <div class="kpi-grid">
+    <div class="kpi"><b class="G">{{c.new}}</b>new {{'people' if pp else 'agencies'}}</div>
+    <div class="kpi"><b>{{c.unchanged}}</b>already in the system, same</div>
+    <div class="kpi"><b class="Y">{{c.differs}}</b>already there but different</div>
+    {% if pp and c.blocked %}
+    <div class="kpi"><b class="R">{{c.blocked}}</b>different but have records (posting locked)</div>
+    {% endif %}
+    {% if not pp and c.repeat %}
+    <div class="kpi"><b>{{c.repeat}}</b>repeated rows (ignored)</div>
+    {% endif %}
+    <div class="kpi"><b class="{{'R' if c.error else 'G'}}">{{c.error}}</b>rows with problems</div>
+  </div>
+
+  {% if pp %}
+  <p class="mut" style="margin: 12px 0 0; font-size: 0.9rem;">
+    New agencies that would be created: <b>{{res.new_agencies}}</b> · new districts from the lookup sheet: <b>{{res.new_districts}}</b>
+  </p>
+  {% endif %}
+</div>
+
+{% if res.errors %}
+<div class="card scroll">
+  <h2 style="margin-top: 0; color: var(--r);">Problems Found ({{res.n_problems}})</h2>
+  <div class="gap-line"></div>
+  <table>
+    <thead>
+      <tr>
+        <th style="text-align: center;">Row</th>
+        <th>Field</th>
+        <th>Problem</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in res.errors %}
+      <tr>
+        <td style="text-align: center; font-weight: 600; font-family: 'Courier New', monospace;">{{e.row}}</td>
+        <td style="font-weight: 600;">{{e.field}}</td>
+        <td style="color: var(--mut);">{{e.problem}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% if res.n_problems > res.errors|length %}
+  <p class="mut" style="margin: 12px 0 0;">Showing first {{res.errors|length}} of {{res.n_problems}}.</p>
+  {% endif %}
+  
+  <p style="margin-top: 14px;">
+    <a class="btn secondary" href="/hq/data/errors/{{res.token}}.csv">📥 Download All Problems (CSV)</a>
+    <span class="mut" style="font-size: 0.85rem;">Row numbers match your source file (row 1 is heading).</span>
+  </p>
+</div>
+{% endif %}
+
+{% if res.sample_updates %}
+<div class="card scroll">
+  <h2 style="margin-top: 0;">Existing Records That Differ ({{c.differs + c.blocked}})</h2>
+  <div class="gap-line"></div>
+  <table>
+    <thead>
+      <tr>
+        <th style="text-align: center;">Row</th>
+        <th>{{ 'Personnel ID' if pp else 'Agency' }}</th>
+        <th>Fields That Differ</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in res.sample_updates %}
+      <tr>
+        <td style="text-align: center; font-weight: 600; font-family: 'Courier New', monospace;">{{s.row}}</td>
+        <td style="font-weight: 600;">{{s.key}}</td>
+        <td style="color: var(--y);">{{s.fields}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p class="mut" style="margin: 12px 0 0; font-size: 0.85rem;">These records are updated only if you enable the checkbox below.</p>
+</div>
+{% endif %}
+
+<div class="card scroll">
+  <h2 style="margin-top: 0;">Validation Checks</h2>
+  <div class="gap-line"></div>
+  <table>
+    <thead>
+      <tr>
+        <th>Check Name</th>
+        <th style="text-align: center;">Rows Checked</th>
+        <th style="text-align: center;">Issues</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for k in res.checks %}
+      <tr>
+        <td style="font-weight: 600;">{{k.name}}</td>
+        <td style="text-align: center;">{{k.checked}}</td>
+        <td style="text-align: center;">
+          <span class="{{'G' if k.issues==0 else ('R' if k.blocking else 'Y')}}">
+            {{k.issues}}
+          </span>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2 style="margin-top: 0;">Save to System</h2>
+  <div class="gap-line"></div>
+  
+  {% if c.new + c.differs + c.blocked == 0 %}
+  <p class="mut">
+    {% if c.error %}
+    ✗ No valid rows to save. Fix the problems above and upload again.
+    {% else %}
+    ✓ All rows are already in the system unchanged. Nothing to save.
+    {% endif %}
+  </p>
+  <p style="margin-top: 16px;">
+    <a class="btn secondary" href="/hq/data">← Back</a>
+  </p>
+  
+  {% else %}
+  
+  <form method="post" action="/hq/data/commit" style="display: grid; gap: 16px;">
+    <input type="hidden" name="csrf_token" value="{{csrf}}">
+    <input type="hidden" name="token" value="{{res.token}}">
+    
+    {% if c.differs or c.blocked %}
+    <label style="display: flex; gap: 10px; align-items: flex-start; cursor: pointer; background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.3); padding: 12px; border-radius: 8px;">
+      <input type="checkbox" name="update_existing" value="1" style="margin-top: 2px; cursor: pointer;">
+      <div>
+        <div style="font-weight: 600; color: #fbbf24;">Also update {{c.differs}} existing record(s) that differ</div>
+        <div class="mut" style="font-size: 0.85rem; margin-top: 4px;">
+          {% if pp %}Personal details and posting details (records with returns/evaluations/visits/outcomes keep their posting){% else %}Agency details{% endif %}
+        </div>
+      </div>
+    </label>
+    {% endif %}
+    
+    {% if pp and res.sites_without_account %}
+    <label style="display: flex; gap: 10px; align-items: flex-start; cursor: pointer; background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.3); padding: 12px; border-radius: 8px;">
+      <input type="checkbox" name="create_accounts" value="1" style="margin-top: 2px; cursor: pointer;">
+      <div>
+        <div style="font-weight: 600; color: var(--g);">Create logins for {{res.sites_without_account}} new posting site(s)</div>
+        <div class="mut" style="font-size: 0.85rem; margin-top: 4px;">Passwords written to credentials file (takes ~{{ ((res.sites_without_account * 0.06)|round|int) or 1 }}s; keep this page open)</div>
+      </div>
+    </label>
+    {% endif %}
+    
+    {% if c.error or c.blocked %}
+    <div style="background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.3); padding: 12px; border-radius: 8px;">
+      <div style="font-weight: 600; color: var(--r); margin-bottom: 10px;">On Errors:</div>
+      <label style="display: flex; gap: 8px; align-items: center; cursor: pointer; margin-bottom: 8px;">
+        <input type="radio" name="on_errors" value="reject_all" checked style="cursor: pointer;">
+        <span>Save nothing if any row has a problem <span class="mut" style="font-weight: 600;">(recommended)</span></span>
+      </label>
+      <label style="display: flex; gap: 8px; align-items: center; cursor: pointer;">
+        <input type="radio" name="on_errors" value="skip_bad_rows" style="cursor: pointer;">
+        <span>Save valid rows and skip rows with problems</span>
+      </label>
+    </div>
+    {% endif %}
+    
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+      <button type="submit" class="btn">✓ Save {{c.new}} New{{'  & Update Existing' if c.differs else ''}}</button>
+      <a class="btn secondary" href="/hq/data">Cancel</a>
+    </div>
+  </form>
+  
+  {% endif %}
+</div>
+
+{% endblock %}

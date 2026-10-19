@@ -1,0 +1,16 @@
+feature,importance
+comp_roll3,0.2193
+composite,0.186
+comp_lag1,0.1239
+comp_lag2,0.1025
+IND03,0.0861
+IND04,0.0813
+IND05,0.0705
+IND02,0.0672
+IND06,0.0162
+comp_delta2,0.0152
+personnel_per_agency,0.0086
+n_posted,0.0082
+share_public,0.0076
+share_private,0.0075
+IND01,0.0

@@ -1,0 +1,64 @@
+{% extends "base.html" %}{% block body %}
+<div class="card">
+  <h1 class="page-title" style="margin: 0 0 8px;">Service Outcomes</h1>
+  <p class="mut" style="margin: 0 0 12px;">Propose the final outcome for each person. Early exits stop attendance returns from the exit month.</p>
+  <div class="gap-line"></div>
+  <p style="margin: 0; font-size: 0.9rem; color: var(--y);">
+    📋 Workflow: Your proposal → District verifies → Region approves → HQ certifies → Feeds analysis
+  </p>
+</div>
+
+<form method="post" class="card scroll">
+  <input type="hidden" name="csrf" value="{{csrf}}">
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Personnel</th>
+        <th>Outcome</th>
+        <th>Date</th>
+        <th>Reason</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      {% set ed = r.status in (none,'REJECTED','SUBMITTED') %}
+      <tr>
+        <td style="font-weight: 600; font-family: 'Courier New', monospace;">
+          {{r.personnel_id}}
+          <div style="font-weight: 500; font-family: system-ui; margin-top: 2px;">{{r.surname}} {{r.other_names}}</div>
+          <input type="hidden" name="pid" value="{{r.personnel_id}}">
+        </td>
+        <td>
+          <select name="oc_{{r.personnel_id}}" {{'' if ed else 'disabled'}} style="min-width: 140px;">
+            <option value="">— Select —</option>
+            {% for o in ['COMPLETED','DISCONTINUED','ABSCONDED','DECEASED'] %}
+            <option {{'selected' if r.outcome==o}}>{{o}}</option>
+            {% endfor %}
+          </select>
+        </td>
+        <td>
+          <input type="date" name="dt_{{r.personnel_id}}" value="{{r.outcome_date if r.outcome_date}}" {{'' if ed else 'disabled'}}>
+        </td>
+        <td>
+          <input name="rs_{{r.personnel_id}}" value="{{r.reason or ''}}" {{'' if ed else 'disabled'}} placeholder="Brief reason…" style="flex: 1; min-width: 180px;">
+        </td>
+        <td>
+          {% if r.status %}
+          <span class="pill {{r.status}}">{{r.status}}</span>
+          {% if r.reject_reason %}
+          <div class="R" style="margin-top: 6px; font-size: 0.85rem;">{{r.reject_reason}}</div>
+          {% endif %}
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+  <div style="margin-top: 20px;">
+    <button type="submit" class="btn">✓ Submit Proposals</button>
+  </div>
+</form>
+{% endblock %}

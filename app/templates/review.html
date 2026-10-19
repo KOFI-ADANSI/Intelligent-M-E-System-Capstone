@@ -1,0 +1,149 @@
+{% extends "base.html" %}{% block body %}
+{% macro actions(kind, r, verb, extra='') %}
+<form method="post" action="/review/act" style="display: flex; gap: 8px; flex-wrap: wrap;">
+  <input type="hidden" name="csrf_token" value="{{csrf}}">
+  <input type="hidden" name="kind" value="{{kind}}">
+  <input type="hidden" name="agency_id" value="{{r.agency_id}}">
+  <input type="hidden" name="district_id" value="{{r.district_id}}">
+  {{extra|safe}}
+  <button name="action" value="advance" type="submit" class="btn">{{verb|capitalize}} all</button>
+  <input name="reason" placeholder="Reason if rejecting…" style="flex: 1; min-width: 160px;">
+  <button name="action" value="reject" type="submit" class="btn bad">Reject</button>
+</form>
+{% endmacro %}
+
+<div class="card">
+  <h2 style="margin-top: 0;">Attendance Returns & Evaluations</h2>
+  <p class="mut" style="margin: 4px 0 12px;">Status: <strong>Ready to {{ret_verb}}</strong></p>
+  <div class="gap-line"></div>
+  
+  {% if returns %}
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Region / District</th>
+          <th>Agency Site</th>
+          <th>Period</th>
+          <th style="text-align: center;">Returns</th>
+          <th style="text-align: center;">Evals</th>
+          <th style="text-align: center;">Avg Attendance</th>
+          <th style="text-align: center;">Not Reported</th>
+          <th style="text-align: center;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in returns %}
+        <tr>
+          <td>
+            <div style="font-weight: 600;">{{r.region_name}}</div>
+            <div class="mut" style="font-size: 0.9rem;">{{r.district_name}}</div>
+          </td>
+          <td>{{r.agency_name}}</td>
+          <td style="font-weight: 600;">{{r.reporting_period|mon}}</td>
+          <td style="text-align: center; font-weight: 600;">{{r.n}} / {{r.headcount}}</td>
+          <td style="text-align: center; font-weight: 600;">{{r.n_evals}}</td>
+          <td style="text-align: center; font-weight: 600;">{{r.avg_att}}%</td>
+          <td style="text-align: center; font-weight: 600;">{{r.not_reported}}</td>
+          <td style="text-align: center;">
+            {{ actions('returns', r, ret_verb, '<input type="hidden" name="period" value="%s">'|format(r.reporting_period)) }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="mut">✓ All returns reviewed. Nothing waiting.</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h2 style="margin-top: 0;">Service Outcomes</h2>
+  <p class="mut" style="margin: 4px 0 12px;">Status: <strong>Ready to {{comp_verb}}</strong></p>
+  <div class="gap-line"></div>
+  
+  {% if comps %}
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Region / District</th>
+          <th>Agency Site</th>
+          <th style="text-align: center;">People</th>
+          <th style="text-align: center;">Outcomes</th>
+          <th style="text-align: center;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in comps %}
+        <tr>
+          <td>
+            <div style="font-weight: 600;">{{r.region_name}}</div>
+            <div class="mut" style="font-size: 0.9rem;">{{r.district_name}}</div>
+          </td>
+          <td>{{r.agency_name}}</td>
+          <td style="text-align: center; font-weight: 600;">{{r.n}}</td>
+          <td style="text-align: center; font-weight: 600;">{{r.outcomes}}</td>
+          <td style="text-align: center;">
+            {{ actions('completion', r, comp_verb) }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="mut">✓ All outcomes reviewed. Nothing waiting.</p>
+  {% endif %}
+</div>
+
+{% if u.role in ('REGION','HQ') %}
+<div class="card">
+  <h2 style="margin-top: 0;">District Monitoring Visits</h2>
+  <p class="mut" style="margin: 4px 0 12px;">Awaiting approval</p>
+  <div class="gap-line"></div>
+  
+  {% if visits %}
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Visit Date</th>
+          <th>District</th>
+          <th>Site</th>
+          <th style="text-align: center;">People Met</th>
+          <th>Findings</th>
+          <th style="text-align: center;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for v in visits %}
+        <tr>
+          <td style="font-weight: 600;">{{v.visit_date}}</td>
+          <td>{{v.district_name}}</td>
+          <td>{{v.agency_name}}</td>
+          <td style="text-align: center; font-weight: 600;">{{v.n_people}}</td>
+          <td style="color: var(--mut); font-size: 0.9rem;">{{v.findings or '—'}}</td>
+          <td style="text-align: center;">
+            <form method="post" action="/review/act" style="display: flex; gap: 8px; flex-wrap: wrap; min-width: 290px;">
+              <input type="hidden" name="csrf_token" value="{{csrf}}">
+              <input type="hidden" name="kind" value="visit">
+              <input type="hidden" name="visit_id" value="{{v.visit_id}}">
+              <input name="reason" placeholder="Reason if rejecting…" aria-label="Reason for rejecting visit" style="flex: 1; min-width: 150px;">
+              <button name="action" value="advance" type="submit" class="btn" style="padding: 6px 10px;">✓ Approve</button>
+              <button name="action" value="reject" type="submit" class="btn bad" style="padding: 6px 10px;">✕ Reject</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="mut">✓ All visits approved. Nothing waiting.</p>
+  {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

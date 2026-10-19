@@ -1,0 +1,141 @@
+district_id,region_name,district_name,scored_period,risk_probability,risk_class,model_version,risk_rank
+107,Upper West,Sissala East,2027-10-01,1.0000,HIGH,rf_final_v1,1
+110,Volta,Ho West,2027-10-01,0.9988,HIGH,rf_final_v1,2
+72,Northern,Yendi Municipal,2027-10-01,0.9961,HIGH,rf_final_v1,3
+97,Upper East,Bawku West,2027-10-01,0.9956,HIGH,rf_final_v1,4
+98,Upper East,Builsa North,2027-10-01,0.9906,HIGH,rf_final_v1,5
+38,Central,Assin Central,2027-10-01,0.9905,HIGH,rf_final_v1,6
+95,Upper East,Bolgatanga East,2027-10-01,0.9883,HIGH,rf_final_v1,7
+85,North East,Bunkpurugu-Nakpanduri,2027-10-01,0.9795,HIGH,rf_final_v1,8
+53,Eastern,Lower Manya Krobo,2027-10-01,0.9780,HIGH,rf_final_v1,9
+132,Western,Wassa Amenfi West,2027-10-01,0.9736,HIGH,rf_final_v1,10
+114,Volta,Ketu South,2027-10-01,0.9681,HIGH,rf_final_v1,11
+56,Greater Accra,Tema Metropolitan,2027-10-01,0.9524,HIGH,rf_final_v1,12
+6,Ahafo,Tano South,2027-10-01,0.9492,HIGH,rf_final_v1,13
+5,Ahafo,Tano North,2027-10-01,0.9434,HIGH,rf_final_v1,14
+2,Ahafo,Asunafo South,2027-10-01,0.9421,HIGH,rf_final_v1,15
+34,Central,Awutu Senya East,2027-10-01,0.9362,HIGH,rf_final_v1,16
+96,Upper East,Bawku Municipal,2027-10-01,0.9073,HIGH,rf_final_v1,17
+26,Bono East,Techiman North,2027-10-01,0.8744,HIGH,rf_final_v1,18
+131,Western,Wassa Amenfi East,2027-10-01,0.8629,HIGH,rf_final_v1,19
+103,Upper West,Wa West,2027-10-01,0.8626,HIGH,rf_final_v1,20
+61,Greater Accra,La Nkwantanang-Madina Municipal,2027-10-01,0.8618,HIGH,rf_final_v1,21
+128,Western,Ahanta West,2027-10-01,0.8575,HIGH,rf_final_v1,22
+73,Northern,Tolon,2027-10-01,0.8558,HIGH,rf_final_v1,23
+135,Western North,Bia East,2027-10-01,0.7339,HIGH,rf_final_v1,24
+68,Greater Accra,Kpone-Katamanso Municipal,2027-10-01,0.6877,HIGH,rf_final_v1,25
+10,Ashanti,Asante Akim South,2027-10-01,0.6561,HIGH,rf_final_v1,26
+106,Upper West,Jirapa Municipal,2027-10-01,0.6305,HIGH,rf_final_v1,27
+130,Western,Nzema East Municipal,2027-10-01,0.6267,HIGH,rf_final_v1,28
+21,Bono,Dormaa East,2027-10-01,0.5836,MEDIUM,rf_final_v1,29
+129,Western,Jomoro,2027-10-01,0.5745,MEDIUM,rf_final_v1,30
+100,Upper East,Kassena-Nankana West,2027-10-01,0.5400,MEDIUM,rf_final_v1,31
+121,Oti,Nkwanta North,2027-10-01,0.4880,MEDIUM,rf_final_v1,32
+62,Greater Accra,La Dade-Kotopon Municipal,2027-10-01,0.4550,MEDIUM,rf_final_v1,33
+22,Bono,Jaman North,2027-10-01,0.4469,MEDIUM,rf_final_v1,34
+84,North East,East Mamprusi,2027-10-01,0.4221,MEDIUM,rf_final_v1,35
+92,Savannah,Central Gonja,2027-10-01,0.4138,MEDIUM,rf_final_v1,36
+120,Oti,Krachi West,2027-10-01,0.4072,MEDIUM,rf_final_v1,37
+116,Volta,South Tongu,2027-10-01,0.4002,MEDIUM,rf_final_v1,38
+136,Western North,Bia West,2027-10-01,0.3880,MEDIUM,rf_final_v1,39
+63,Greater Accra,Ledzokuku Municipal,2027-10-01,0.3542,MEDIUM,rf_final_v1,40
+24,Bono,Wenchi Municipal,2027-10-01,0.3510,MEDIUM,rf_final_v1,41
+105,Upper West,Lawra,2027-10-01,0.3434,MEDIUM,rf_final_v1,42
+18,Bono,Sunyani Municipal,2027-10-01,0.3095,MEDIUM,rf_final_v1,43
+67,Greater Accra,Ashaiman Municipal,2027-10-01,0.2744,LOW,rf_final_v1,44
+101,Upper West,Wa Municipal,2027-10-01,0.1871,LOW,rf_final_v1,45
+13,Ashanti,Mampong Municipal,2027-10-01,0.1835,LOW,rf_final_v1,46
+16,Ashanti,Sekyere Central,2027-10-01,0.1315,LOW,rf_final_v1,47
+59,Greater Accra,Ga South Municipal,2027-10-01,0.1263,LOW,rf_final_v1,48
+39,Central,Asikuma-Odoben-Brakwa,2027-10-01,0.1234,LOW,rf_final_v1,49
+115,Volta,North Tongu,2027-10-01,0.0960,LOW,rf_final_v1,50
+82,North East,Nalerigu-Gambaga,2027-10-01,0.0957,LOW,rf_final_v1,51
+33,Central,Agona West,2027-10-01,0.0889,LOW,rf_final_v1,52
+37,Central,Komenda-Edina-Eguafo-Abirem,2027-10-01,0.0813,LOW,rf_final_v1,53
+134,Western North,Bibiani-Anhwiaso-Bekwai,2027-10-01,0.0774,LOW,rf_final_v1,54
+20,Bono,Dormaa Central,2027-10-01,0.0698,LOW,rf_final_v1,55
+49,Eastern,Birim North,2027-10-01,0.0668,LOW,rf_final_v1,56
+74,Northern,Kumbungu,2027-10-01,0.0626,LOW,rf_final_v1,57
+54,Eastern,Upper Manya Krobo,2027-10-01,0.0394,LOW,rf_final_v1,58
+25,Bono East,Techiman Municipal,2027-10-01,0.0352,LOW,rf_final_v1,59
+7,Ashanti,Kumasi Metropolitan,2027-10-01,0.0326,LOW,rf_final_v1,60
+88,Savannah,Damongo Municipal,2027-10-01,0.0315,LOW,rf_final_v1,61
+111,Volta,Keta Municipal,2027-10-01,0.0313,LOW,rf_final_v1,62
+65,Greater Accra,Ablekuma Central Municipal,2027-10-01,0.0312,LOW,rf_final_v1,63
+138,Western North,Juaboso,2027-10-01,0.0263,LOW,rf_final_v1,64
+71,Northern,Sagnarigu Municipal,2027-10-01,0.0162,LOW,rf_final_v1,65
+48,Eastern,Birim Central,2027-10-01,0.0133,LOW,rf_final_v1,66
+8,Ashanti,Asante Akim Central,2027-10-01,0.0128,LOW,rf_final_v1,67
+118,Oti,Krachi East,2027-10-01,0.0105,LOW,rf_final_v1,68
+12,Ashanti,Kwabre East,2027-10-01,0.0079,LOW,rf_final_v1,69
+87,North East,Yunyoo-Nasuan,2027-10-01,0.0069,LOW,rf_final_v1,70
+83,North East,West Mamprusi,2027-10-01,0.0068,LOW,rf_final_v1,71
+32,Central,Cape Coast Metropolitan,2027-10-01,0.0062,LOW,rf_final_v1,72
+123,Oti,Jasikan Municipal,2027-10-01,0.0057,LOW,rf_final_v1,73
+35,Central,Awutu Senya West,2027-10-01,0.0057,LOW,rf_final_v1,74
+19,Bono,Berekum Municipal,2027-10-01,0.0056,LOW,rf_final_v1,75
+3,Ahafo,Asutifi,2027-10-01,0.0055,LOW,rf_final_v1,76
+93,Savannah,East Gonja Municipal,2027-10-01,0.0049,LOW,rf_final_v1,77
+58,Greater Accra,Ga Central Municipal,2027-10-01,0.0048,LOW,rf_final_v1,78
+69,Greater Accra,Weija-Gbawe Municipal,2027-10-01,0.0044,LOW,rf_final_v1,79
+43,Central,Upper Denkyira East,2027-10-01,0.0043,LOW,rf_final_v1,80
+55,Greater Accra,Accra Metropolitan,2027-10-01,0.0038,LOW,rf_final_v1,81
+122,Oti,Nkwanta South,2027-10-01,0.0038,LOW,rf_final_v1,82
+44,Eastern,New Juaben South,2027-10-01,0.0035,LOW,rf_final_v1,83
+89,Savannah,Bole,2027-10-01,0.0033,LOW,rf_final_v1,84
+45,Eastern,New Juaben North,2027-10-01,0.0032,LOW,rf_final_v1,85
+75,Northern,Savelugu Municipal,2027-10-01,0.0032,LOW,rf_final_v1,86
+17,Ashanti,Ejisu Municipal,2027-10-01,0.0031,LOW,rf_final_v1,87
+30,Bono East,Nkoranza South,2027-10-01,0.0029,LOW,rf_final_v1,88
+112,Volta,Kpando Municipal,2027-10-01,0.0026,LOW,rf_final_v1,89
+86,North East,Chereponi,2027-10-01,0.0024,LOW,rf_final_v1,90
+64,Greater Accra,Ablekuma North Municipal,2027-10-01,0.0024,LOW,rf_final_v1,91
+29,Bono East,Nkoranza North,2027-10-01,0.0024,LOW,rf_final_v1,92
+11,Ashanti,Ejura Sekyedumase,2027-10-01,0.0024,LOW,rf_final_v1,93
+50,Eastern,Birim South,2027-10-01,0.0024,LOW,rf_final_v1,94
+133,Western North,Sefwi Wiawso Municipal,2027-10-01,0.0021,LOW,rf_final_v1,95
+94,Upper East,Bolgatanga Municipal,2027-10-01,0.0019,LOW,rf_final_v1,96
+104,Upper West,Nandom,2027-10-01,0.0017,LOW,rf_final_v1,97
+77,Northern,Karaga,2027-10-01,0.0017,LOW,rf_final_v1,98
+57,Greater Accra,Ga East Municipal,2027-10-01,0.0017,LOW,rf_final_v1,99
+40,Central,Effutu Municipal,2027-10-01,0.0017,LOW,rf_final_v1,100
+46,Eastern,Akuapem North,2027-10-01,0.0017,LOW,rf_final_v1,101
+108,Upper West,Sissala West,2027-10-01,0.0014,LOW,rf_final_v1,102
+91,Savannah,North Gonja,2027-10-01,0.0008,LOW,rf_final_v1,103
+113,Volta,Ketu North,2027-10-01,0.0008,LOW,rf_final_v1,104
+76,Northern,Gushegu,2027-10-01,0.0008,LOW,rf_final_v1,105
+70,Northern,Tamale Metropolitan,2027-10-01,0.0008,LOW,rf_final_v1,106
+1,Ahafo,Asunafo North,2027-10-01,0.0008,LOW,rf_final_v1,107
+52,Eastern,Kwahu East,2027-10-01,0.0000,LOW,rf_final_v1,108
+109,Volta,Ho Municipal,2027-10-01,0.0000,LOW,rf_final_v1,109
+41,Central,Gomoa East,2027-10-01,0.0000,LOW,rf_final_v1,110
+90,Savannah,Sawla-Tuna-Kalba,2027-10-01,0.0000,LOW,rf_final_v1,111
+36,Central,Mfantsiman Municipal,2027-10-01,0.0000,LOW,rf_final_v1,112
+31,Bono East,Atebubu-Amantin,2027-10-01,0.0000,LOW,rf_final_v1,113
+60,Greater Accra,Ga West Municipal,2027-10-01,0.0000,LOW,rf_final_v1,114
+117,Oti,Kadjebi,2027-10-01,0.0000,LOW,rf_final_v1,115
+66,Greater Accra,Adentan Municipal,2027-10-01,0.0000,LOW,rf_final_v1,116
+119,Oti,Krachi Nchumuru,2027-10-01,0.0000,LOW,rf_final_v1,117
+28,Bono East,Kintampo North,2027-10-01,0.0000,LOW,rf_final_v1,118
+27,Bono East,Kintampo Municipal,2027-10-01,0.0000,LOW,rf_final_v1,119
+124,Western,Sekondi-Takoradi Metropolitan,2027-10-01,0.0000,LOW,rf_final_v1,120
+125,Western,Tarkwa-Nsuaem Municipal,2027-10-01,0.0000,LOW,rf_final_v1,121
+126,Western,Prestea-Huni Valley,2027-10-01,0.0000,LOW,rf_final_v1,122
+127,Western,Ellembelle,2027-10-01,0.0000,LOW,rf_final_v1,123
+23,Bono,Jaman South,2027-10-01,0.0000,LOW,rf_final_v1,124
+81,Northern,Zabzugu,2027-10-01,0.0000,LOW,rf_final_v1,125
+80,Northern,Saboba,2027-10-01,0.0000,LOW,rf_final_v1,126
+15,Ashanti,Offinso Municipal,2027-10-01,0.0000,LOW,rf_final_v1,127
+14,Ashanti,Obuasi Municipal,2027-10-01,0.0000,LOW,rf_final_v1,128
+79,Northern,Nanumba South,2027-10-01,0.0000,LOW,rf_final_v1,129
+78,Northern,Nanumba North,2027-10-01,0.0000,LOW,rf_final_v1,130
+9,Ashanti,Asante Akim North,2027-10-01,0.0000,LOW,rf_final_v1,131
+4,Ahafo,Asutifi South,2027-10-01,0.0000,LOW,rf_final_v1,132
+137,Western North,Aowin Municipal,2027-10-01,0.0000,LOW,rf_final_v1,133
+139,Western North,Suaman,2027-10-01,0.0000,LOW,rf_final_v1,134
+102,Upper West,Wa East,2027-10-01,0.0000,LOW,rf_final_v1,135
+140,Western North,Sefwi Akontombra,2027-10-01,0.0000,LOW,rf_final_v1,136
+47,Eastern,Akuapem South,2027-10-01,0.0000,LOW,rf_final_v1,137
+99,Upper East,Builsa South,2027-10-01,0.0000,LOW,rf_final_v1,138
+51,Eastern,Kwahu West,2027-10-01,0.0000,LOW,rf_final_v1,139
+42,Central,Gomoa West,2027-10-01,0.0000,LOW,rf_final_v1,140

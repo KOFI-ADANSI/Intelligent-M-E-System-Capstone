@@ -1,0 +1,141 @@
+district_id,region_name,district_name
+1,Ahafo,Asunafo North
+2,Ahafo,Asunafo South
+3,Ahafo,Asutifi
+4,Ahafo,Asutifi South
+5,Ahafo,Tano North
+6,Ahafo,Tano South
+7,Ashanti,Kumasi Metropolitan
+8,Ashanti,Asante Akim Central
+9,Ashanti,Asante Akim North
+10,Ashanti,Asante Akim South
+11,Ashanti,Ejura Sekyedumase
+12,Ashanti,Kwabre East
+13,Ashanti,Mampong Municipal
+14,Ashanti,Obuasi Municipal
+15,Ashanti,Offinso Municipal
+16,Ashanti,Sekyere Central
+17,Ashanti,Ejisu Municipal
+18,Bono,Sunyani Municipal
+19,Bono,Berekum Municipal
+20,Bono,Dormaa Central
+21,Bono,Dormaa East
+22,Bono,Jaman North
+23,Bono,Jaman South
+24,Bono,Wenchi Municipal
+25,Bono East,Techiman Municipal
+26,Bono East,Techiman North
+27,Bono East,Kintampo Municipal
+28,Bono East,Kintampo North
+29,Bono East,Nkoranza North
+30,Bono East,Nkoranza South
+31,Bono East,Atebubu-Amantin
+32,Central,Cape Coast Metropolitan
+33,Central,Agona West
+34,Central,Awutu Senya East
+35,Central,Awutu Senya West
+36,Central,Mfantsiman Municipal
+37,Central,Komenda-Edina-Eguafo-Abirem
+38,Central,Assin Central
+39,Central,Asikuma-Odoben-Brakwa
+40,Central,Effutu Municipal
+41,Central,Gomoa East
+42,Central,Gomoa West
+43,Central,Upper Denkyira East
+44,Eastern,New Juaben South
+45,Eastern,New Juaben North
+46,Eastern,Akuapem North
+47,Eastern,Akuapem South
+48,Eastern,Birim Central
+49,Eastern,Birim North
+50,Eastern,Birim South
+51,Eastern,Kwahu West
+52,Eastern,Kwahu East
+53,Eastern,Lower Manya Krobo
+54,Eastern,Upper Manya Krobo
+55,Greater Accra,Accra Metropolitan
+56,Greater Accra,Tema Metropolitan
+57,Greater Accra,Ga East Municipal
+58,Greater Accra,Ga Central Municipal
+59,Greater Accra,Ga South Municipal
+60,Greater Accra,Ga West Municipal
+61,Greater Accra,La Nkwantanang-Madina Municipal
+62,Greater Accra,La Dade-Kotopon Municipal
+63,Greater Accra,Ledzokuku Municipal
+64,Greater Accra,Ablekuma North Municipal
+65,Greater Accra,Ablekuma Central Municipal
+66,Greater Accra,Adentan Municipal
+67,Greater Accra,Ashaiman Municipal
+68,Greater Accra,Kpone-Katamanso Municipal
+69,Greater Accra,Weija-Gbawe Municipal
+70,Northern,Tamale Metropolitan
+71,Northern,Sagnarigu Municipal
+72,Northern,Yendi Municipal
+73,Northern,Tolon
+74,Northern,Kumbungu
+75,Northern,Savelugu Municipal
+76,Northern,Gushegu
+77,Northern,Karaga
+78,Northern,Nanumba North
+79,Northern,Nanumba South
+80,Northern,Saboba
+81,Northern,Zabzugu
+82,North East,Nalerigu-Gambaga
+83,North East,West Mamprusi
+84,North East,East Mamprusi
+85,North East,Bunkpurugu-Nakpanduri
+86,North East,Chereponi
+87,North East,Yunyoo-Nasuan
+88,Savannah,Damongo Municipal
+89,Savannah,Bole
+90,Savannah,Sawla-Tuna-Kalba
+91,Savannah,North Gonja
+92,Savannah,Central Gonja
+93,Savannah,East Gonja Municipal
+94,Upper East,Bolgatanga Municipal
+95,Upper East,Bolgatanga East
+96,Upper East,Bawku Municipal
+97,Upper East,Bawku West
+98,Upper East,Builsa North
+99,Upper East,Builsa South
+100,Upper East,Kassena-Nankana West
+101,Upper West,Wa Municipal
+102,Upper West,Wa East
+103,Upper West,Wa West
+104,Upper West,Nandom
+105,Upper West,Lawra
+106,Upper West,Jirapa Municipal
+107,Upper West,Sissala East
+108,Upper West,Sissala West
+109,Volta,Ho Municipal
+110,Volta,Ho West
+111,Volta,Keta Municipal
+112,Volta,Kpando Municipal
+113,Volta,Ketu North
+114,Volta,Ketu South
+115,Volta,North Tongu
+116,Volta,South Tongu
+117,Oti,Kadjebi
+118,Oti,Krachi East
+119,Oti,Krachi Nchumuru
+120,Oti,Krachi West
+121,Oti,Nkwanta North
+122,Oti,Nkwanta South
+123,Oti,Jasikan Municipal
+124,Western,Sekondi-Takoradi Metropolitan
+125,Western,Tarkwa-Nsuaem Municipal
+126,Western,Prestea-Huni Valley
+127,Western,Ellembelle
+128,Western,Ahanta West
+129,Western,Jomoro
+130,Western,Nzema East Municipal
+131,Western,Wassa Amenfi East
+132,Western,Wassa Amenfi West
+133,Western North,Sefwi Wiawso Municipal
+134,Western North,Bibiani-Anhwiaso-Bekwai
+135,Western North,Bia East
+136,Western North,Bia West
+137,Western North,Aowin Municipal
+138,Western North,Juaboso
+139,Western North,Suaman
+140,Western North,Sefwi Akontombra
