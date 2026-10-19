@@ -91,3 +91,5 @@ A key confounding result is the district fixed-effects comparison. The raw assoc
 | 6. Decision support | dashboard and HQ refresh workflow | the app pages and refresh actions in `app/` plus the Power BI export workflow |
 
 These notes should be used as the narrative baseline for the write-up and to ensure the demonstration is described as synthetic, model-based decision support, and not as causal evidence from observational data.
+#   I n t e l l i g e n t - M - E - S y s t e m - C a p s t o n e  
+ 
